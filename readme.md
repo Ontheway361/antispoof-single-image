@@ -1,7 +1,7 @@
 ## Motivation
 Package LGSC into a universal basic module for following research and projects
 
-## Repository
+## Reference
 ```
 raw-repository     : https://github.com/VIS-VAR/LGSC-for-FAS
 pytorch-repository : https://github.com/Podidiving/lgsc-for-fas-pytorch
