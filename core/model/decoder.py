@@ -47,8 +47,8 @@ class DeCoder(nn.Module):
             self.conv2x2.append(conv2x2)
             self.conv1x1.append(conv1x1)
         self.res_layers = nn.ModuleList(self.res_layers)
-        self.conv2x2   = nn.ModuleList(self.conv2x2)
-        self.conv1x1   = nn.ModuleList(self.conv1x1)
+        self.conv2x2    = nn.ModuleList(self.conv2x2)
+        self.conv1x1    = nn.ModuleList(self.conv1x1)
 
     def forward(self, x):
 

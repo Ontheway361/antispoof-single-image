@@ -47,7 +47,6 @@ class Classifier(nn.Module):
         self.resnet18 = models.resnet18(pretrained=pretrained)
         self.resnet18.fc = nn.Linear(self.resnet18.fc.in_features, num_classes)
         self.dropout  = nn.Dropout(drop_ratio)
-
         self._freeze_backbone()
 
     def _freeze_backbone(self):
