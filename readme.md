@@ -7,6 +7,9 @@ raw-repository     : https://github.com/VIS-VAR/LGSC-for-FAS
 pytorch-repository : https://github.com/Podidiving/lgsc-for-fas-pytorch
 ```
 
+## Pipeline
+![Image text](https://github.com/Ontheway361/antispoof-single-image/blob/master/pipeline/pipeline_lgsc.png)
+
 ## Citation
 ```
 @inproceedings{

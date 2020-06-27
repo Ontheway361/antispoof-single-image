@@ -7,10 +7,10 @@ from decoder import DeCoder
 from encoder import EnCoder, Classifier
 from IPython import embed
 
-class SCAN(nn.Module):
+class LGSC(nn.Module):
 
     def __init__(self, drop_ratio = 0.5, pretrained = True):
-        super(SCAN, self).__init__()
+        super(LGSC, self).__init__()
         self.encoder = EnCoder(pretrained=pretrained)
         self.decoder = DeCoder()
         self.auxcfer = Classifier(drop_ratio=drop_ratio, pretrained=pretrained)
@@ -26,7 +26,7 @@ class SCAN(nn.Module):
 if __name__ == "__main__":
 
     input  = torch.Tensor(10, 3, 224, 224)
-    antisp = SCAN()
+    antisp = LGSC()
     outs, clfo = antisp(input)
     for feat in outs:
         print(feat.shape)
