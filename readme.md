@@ -3,8 +3,8 @@ Package LGSC into a universal basic module for following research and projects
 
 ## Reference
 ```
-raw-repository     : https://github.com/VIS-VAR/LGSC-for-FAS
-pytorch-repository : https://github.com/Podidiving/lgsc-for-fas-pytorch
+[1].https://github.com/VIS-VAR/LGSC-for-FAS
+[2].https://github.com/Podidiving/lgsc-for-fas-pytorch
 ```
 
 ## Pipeline
