@@ -8,7 +8,24 @@ import numpy as np
 import albumentations as alt
 from albumentations.pytorch import ToTensorV2 as ToTensor
 
+from IPython import embed
 
+def get_train_augmentations():
+    return alt.Compose(
+        [   
+            alt.Resize(224, 224, p=1),
+            alt.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=20, val_shift_limit=10, p=0.2),
+            alt.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.3),
+            alt.CoarseDropout(10),
+            alt.Rotate(30),
+            alt.Normalize(),
+            ToTensor(),
+        ]
+    )
+
+'''
+I think this kind of augmentation was not reasonable !!!
+reference : https://github.com/Podidiving/lgsc-for-fas-pytorch
 def get_train_augmentations():
     return alt.Compose(
         [
@@ -22,6 +39,7 @@ def get_train_augmentations():
             ToTensor(),
         ]
     )
+'''
 
 
 def get_test_augmentations():
@@ -41,11 +59,11 @@ class DataBase(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
 
-        path = os.path.join(self.root, self.df.iloc[index].path)
+        path = os.path.join(self.root, self.df.iloc[index].now_path)
         file = np.random.choice(os.listdir(path))
         full_path = os.path.join(path, file)
         # image = np.array(Image.open(full_path))
         image = cv2.imread(full_path)
         image = self.transforms(image=image)['image']
         target = self.df.iloc[index].target
-        return image, target
+        return (image, target)

@@ -2,7 +2,7 @@
 #-*- coding:utf-8 -*-
 
 import torch.nn as nn
-from utils import batch_all_triplet_loss
+from core.loss.utils import batch_all_triplet_loss
 
 
 class TripletLoss(nn.Module):

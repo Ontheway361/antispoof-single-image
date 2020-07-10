@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 #-*- coding:utf-8 -*-
+
 import os
 import time
 import torch
@@ -14,6 +15,8 @@ import core as corelib
 import dataset as dlib
 from config import training_args
 
+from IPython import embed
+
 class LGSCTrainer(object):
 
     def __init__(self, args):
@@ -27,8 +30,8 @@ class LGSCTrainer(object):
 
     def _model_loader(self):
 
-        self.model['lgsc']      = corelib.LGSC(drop_ratio=args.drop_ratio)
-        self.model['triplet']   = corelib.TripletLoss(margin=args.margin)
+        self.model['lgsc']      = corelib.LGSC(drop_ratio=self.args.drop_ratio)
+        self.model['triplet']   = corelib.TripletLoss(margin=self.args.margin)
         self.model['optimizer'] = torch.optim.Adam(
                                       self.model['lgsc'].parameters(), lr=self.args.base_lr)
         self.model['scheduler'] = torch.optim.lr_scheduler.MultiStepLR(
@@ -36,11 +39,11 @@ class LGSCTrainer(object):
                                       milestones=self.args.milestones, gamma=self.args.gamma)
         if self.usecuda:
             self.model['lgsc'] = self.model['lgsc'].cuda()
-            if len(args.gpu_ids) > 1:
+            if len(self.args.gpu_ids) > 1:
                 self.model['lgsc'] = torch.nn.DataParallel(self.model['lgsc'], device_ids=self.args.gpu_ids)
                 print('Parallel mode is going ...')
 
-        if len(self.resume) > 3:
+        if len(self.args.resume) > 3:
             checkpoint = torch.load(self.args.resume, map_location=lambda storage, loc: storage)
             self.args.start_epoch = checkpoint['epoch']
             self.model['lgsc'].load_state_dict(checkpoint['backbone'])
@@ -57,7 +60,6 @@ class LGSCTrainer(object):
         self.data['train_loader'] = DataLoader(
                                         dlib.DataBase(df_train, self.args.data_path, train_trans),
                                         batch_size=self.args.batch_size,
-                                        num_workers=self.args.workers,
                                         sampler=sampler)
 
         test_trans = dlib.get_test_augmentations()
@@ -65,7 +67,6 @@ class LGSCTrainer(object):
         self.data['test_loader'] = DataLoader(
                                         dlib.DataBase(df_test, self.args.data_path, test_trans),
                                         batch_size=self.args.batch_size, \
-                                        num_workers=self.args.workers,
                                         shuffle=False,
                                         drop_last=False)
         print('Data loading was finished ...')
@@ -101,6 +102,7 @@ class LGSCTrainer(object):
                 imgs = imgs.cuda()
                 gtys = gtys.cuda()
             
+            embed()
             imgs_feats, clf_out = self.model['lgsc'](imgs)
             loss = self.calc_losses(imgs_feats, clf_out, gtys)
             iter_loss_list.append(loss)
@@ -182,11 +184,11 @@ class LGSCTrainer(object):
             shutil.copy(save_name, normal_name)
             
 
-    def lgsc_runner(self):
+    def lgsc_training(self):
         
         self.result['max_acc']  = -1.0
         self.result['min_loss'] = 100
-        for epoch in range(1, self.args.epoches + 1):
+        for epoch in range(self.args.start_epoch, self.args.n_epoches + 1):
             
             start_time = time.time()
             self.result['epoch'] = epoch
@@ -195,9 +197,16 @@ class LGSCTrainer(object):
             finish_time = time.time()
             print('single epoch costs %.4f mins' % ((finish_time - start_time) / 60))
             self.save_weights(test_info)
+    
+    
+    def main_runner(self):
+        
+        self._model_loader()
+        self._data_loader()
+        self.lgsc_training()
 
             
 if __name__ == "__main__":
     
-    lgsc = LGSCTrainer(args=training_args)
-    lgsc.lgsc_runner()
+    lgsc = LGSCTrainer(args=training_args())
+    lgsc.main_runner()
