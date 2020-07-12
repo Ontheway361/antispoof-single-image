@@ -4,6 +4,7 @@
 import os
 import time
 import torch
+import shutil
 import numpy as np
 import pandas as pd
 from sklearn import metrics
@@ -21,11 +22,12 @@ class LGSCTrainer(object):
 
     def __init__(self, args):
 
-        self.args    = args
-        self.model   = dict()
-        self.data    = dict()
-        self.result  = dict()
-        self.usecuda = args.use_gpu and torch.cuda.is_available()
+        self.args     = args
+        self.model    = dict()
+        self.data     = dict()
+        self.result   = dict()
+        self.softmax  = torch.nn.Softmax(dim=1)
+        self.use_cuda = args.use_gpu and torch.cuda.is_available()
 
 
     def _model_loader(self):
@@ -37,7 +39,7 @@ class LGSCTrainer(object):
         self.model['scheduler'] = torch.optim.lr_scheduler.MultiStepLR(
                                       self.model['optimizer'], \
                                       milestones=self.args.milestones, gamma=self.args.gamma)
-        if self.usecuda:
+        if self.use_cuda:
             self.model['lgsc'] = self.model['lgsc'].cuda()
             if len(self.args.gpu_ids) > 1:
                 self.model['lgsc'] = torch.nn.DataParallel(self.model['lgsc'], device_ids=self.args.gpu_ids)
@@ -54,16 +56,20 @@ class LGSCTrainer(object):
     def _data_loader(self):
 
         train_trans = dlib.get_train_augmentations()
+        test_trans  = dlib.get_test_augmentations()
         df_train = pd.read_csv(self.args.train_file)
+        df_test  = pd.read_csv(self.args.test_file)
+        if self.args.is_debug:
+            df_train = df_train.sample(frac=1.0).iloc[:2*self.args.batch_size, :]
+            df_test  = df_test.sample(frac=1.0).iloc[:2*self.args.batch_size, :]
+            print('### Debug mode was going ###')
+            
         labels = list(df_train.target.values)
         sampler = BalanceClassSampler(labels, mode="upsampling")
         self.data['train_loader'] = DataLoader(
                                         dlib.DataBase(df_train, self.args.data_path, train_trans),
                                         batch_size=self.args.batch_size,
                                         sampler=sampler)
-
-        test_trans = dlib.get_test_augmentations()
-        df_test = pd.read_csv(self.args.test_file)
         self.data['test_loader'] = DataLoader(
                                         dlib.DataBase(df_test, self.args.data_path, test_trans),
                                         batch_size=self.args.batch_size, \
@@ -76,9 +82,9 @@ class LGSCTrainer(object):
         ''' calculte the loss for LGSC '''
 
         clf_loss = F.cross_entropy(clf_out, target) * self.args.loss_coef['clf_loss']
-        cue = target.reshape(-1, 1, 1, 1) * outs[-1]
-        num_reg = (torch.sum(target) * cue.shape[1] * cue.shape[2] * cue.shape[3]).type(torch.float)
-        reg_loss = (torch.sum(torch.abs(cue)) / (num_reg + 1e-9)) * self.args.loss_coef['reg_loss']
+        cue_feat = target.reshape(-1, 1, 1, 1).float() * outs[-1]
+        num_reg  = (torch.sum(target) * np.prod(cue_feat.shape[1:])).type(torch.float)
+        reg_loss = (torch.sum(torch.abs(cue_feat)) / (num_reg + 1e-9)) * self.args.loss_coef['reg_loss']
 
         trip_loss = 0
         batchsize = outs[-1].shape[0]
@@ -98,17 +104,16 @@ class LGSCTrainer(object):
             imgs.requires_grad = False
             gtys.requires_grad = False
             
-            if self.usecuda:
+            if self.use_cuda:
                 imgs = imgs.cuda()
                 gtys = gtys.cuda()
             
-            embed()
             imgs_feats, clf_out = self.model['lgsc'](imgs)
             loss = self.calc_losses(imgs_feats, clf_out, gtys)
-            iter_loss_list.append(loss)
+            iter_loss_list.append(loss.item())
             if (idx + 1) % self.args.print_freq == 0:
-                print('epoch : %2d|%2d, iter : %4d|%4d,  loss : %.4f' % (self.result['epoch'], self.args.end_epoch, idx+1, \
-                                                                         len(self.data['train_loader']), np.mean(loss)))
+                print('epoch : %2d|%2d, iter : %4d|%4d,  loss : %.4f' % (self.result['epoch'], 
+                           self.args.n_epoches, idx+1, len(self.data['train_loader']), np.mean(iter_loss_list)))
         train_loss = np.mean(iter_loss_list)
         print('train_loss : %.4f' % train_loss)
         return train_loss
@@ -117,24 +122,26 @@ class LGSCTrainer(object):
     def test_one_epoch(self):
         
         self.model['lgsc'].eval()
-        with torch.no_gard():
+        with torch.no_grad():
             iter_loss_list = []
             iter_gtys_list = []
             iter_pred_list = []
             for idx, (imgs, gtys) in enumerate(self.data['test_loader']):
                 
-                if self.usecuda:
+                if self.use_cuda:
                     imgs = imgs.cuda()
-                    gtys = imgs.cuda()
-                imgs_feats, cls_out = self.model['lgsc'](imgs)
-                loss = self.calc_losses(imgs_feats, clf_out, gtys)
+                    gtys = gtys.cuda()
+                imgs_feats, clf_out = self.model['lgsc'](imgs)
+                loss  = self.calc_losses(imgs_feats, clf_out, gtys)
+                score = self.softmax(clf_out).cpu().numpy()[:, 1].tolist()
                 iter_loss_list.append(loss.item())
-                iter_gtys_list.extend(gtys.data.cpu().numpy().tolist())
-                iter_pred_list.extend(cls_out.data.cpu().numpy().tolist())
+                iter_gtys_list.extend(gtys.cpu().numpy().tolist())
+                iter_pred_list.extend(score)
         eval_info = {}
         eval_info['loss'] = np.mean(iter_loss_list)
-        eval_info['rauc']  = metrics.roc_auc_score(iter_gtys_list, iter_pred_list)
+        eval_info['rauc'] = metrics.roc_auc_score(np.array(iter_gtys_list), np.array(iter_pred_list))
         # eval_info['eval_auc']  = self.calculate_acc(iter_gtys_list, iter_pred_list)
+        print('test_loss : %.4f, roc_auc_score : %.4f' % (eval_info['loss'], eval_info['rauc']))
         return eval_info
             
             
@@ -197,7 +204,9 @@ class LGSCTrainer(object):
             finish_time = time.time()
             print('single epoch costs %.4f mins' % ((finish_time - start_time) / 60))
             self.save_weights(test_info)
-    
+            
+            if self.args.is_debug:
+                break
     
     def main_runner(self):
         

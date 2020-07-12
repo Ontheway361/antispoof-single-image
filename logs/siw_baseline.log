@@ -1,0 +1,18 @@
+/opt/conda/lib/python3.7/site-packages/tqdm/std.py:668: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  from pandas import Panel
+Parallel mode is going ...
+Model loading was finished ...
+Data loading was finished ...
+Traceback (most recent call last):
+  File "train.py", line 220, in <module>
+    lgsc.main_runner()
+  File "train.py", line 214, in main_runner
+    self.lgsc_training()
+  File "train.py", line 201, in lgsc_training
+    train_loss = self.train_one_epoch()
+  File "train.py", line 116, in train_one_epoch
+    self.args.n_epoches, idx+1, len(self.data['train_loader']), np.mean(loss)))
+  File "<__array_function__ internals>", line 6, in mean
+  File "/opt/conda/lib/python3.7/site-packages/numpy/core/fromnumeric.py", line 3254, in mean
+    return mean(axis=axis, dtype=dtype, out=out, **kwargs)
+TypeError: mean() missing 3 required positional argument: "dim", "keepdim", "dtype"

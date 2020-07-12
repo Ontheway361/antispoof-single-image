@@ -4,7 +4,7 @@
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-from .basemodule import BasicBlock, _make_res_layer
+from basemodule import BasicBlock, _make_res_layer
 from IPython import embed
 
 

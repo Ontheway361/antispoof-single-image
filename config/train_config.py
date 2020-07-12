@@ -12,7 +12,7 @@ def training_args():
 
     # -- env
     parser.add_argument('--use_gpu', type=bool, default=True)
-    parser.add_argument('--gpu_ids', type=list, default=[0, 1])
+    parser.add_argument('--gpu_ids', type=list, default=[0, 1, 2, 3])
     parser.add_argument('--workers', type=int,  default=4)
 
     # -- model
@@ -30,14 +30,13 @@ def training_args():
     parser.add_argument('--gamma',       type=float, default=0.3)       # org-repo TODO
     parser.add_argument('--resume',      type=str,   default='')        # checkpoint
 
-
     # -- dataset
     parser.add_argument('--data_path',  type=str, default=root_dir)
     parser.add_argument('--train_file', type=str, default=osp.join(root_dir, 'anno_file/train_normal_sample.csv'))  # 2316
     parser.add_argument('--test_file',  type=str, default=osp.join(root_dir, 'anno_file/test_normal_sample.csv'))   # 1967
 
     # -- save or print
-    parser.add_argument('--is_debug',  type=str, default=True)
+    parser.add_argument('--is_debug',  type=str, default=False)
     parser.add_argument('--save_to',   type=str, default=osp.join(cp_dir, 'siw_baseline'))
     parser.add_argument('--print_freq',type=int, default=36)   # (2316, 32, 73)
     parser.add_argument('--save_freq', type=int, default=2)    
