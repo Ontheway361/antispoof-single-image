@@ -8,7 +8,7 @@ cp_dir   = '/home/jovyan/jupyter/checkpoints_zoo/face-antisp/single-1.0'
 
 def training_args():
 
-    parser = argparse.ArgumentParser(description='PyTorch metricface')
+    parser = argparse.ArgumentParser(description='PyTorch of antispoof-single-image')
 
     # -- env
     parser.add_argument('--use_gpu', type=bool, default=True)
