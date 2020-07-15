@@ -3,16 +3,50 @@
 Parallel mode is going ...
 Model loading was finished ...
 Data loading was finished ...
-Traceback (most recent call last):
-  File "train.py", line 220, in <module>
-    lgsc.main_runner()
-  File "train.py", line 214, in main_runner
-    self.lgsc_training()
-  File "train.py", line 201, in lgsc_training
-    train_loss = self.train_one_epoch()
-  File "train.py", line 116, in train_one_epoch
-    self.args.n_epoches, idx+1, len(self.data['train_loader']), np.mean(loss)))
-  File "<__array_function__ internals>", line 6, in mean
-  File "/opt/conda/lib/python3.7/site-packages/numpy/core/fromnumeric.py", line 3254, in mean
-    return mean(axis=axis, dtype=dtype, out=out, **kwargs)
-TypeError: mean() missing 3 required positional argument: "dim", "keepdim", "dtype"
+epoch :  1|20, iter :   36| 101,  loss : 80.5289
+epoch :  1|20, iter :   72| 101,  loss : 79.9439
+train_loss : 80.1715
+test_loss : 6.9335, roc_auc_score : 0.2327
+single epoch costs 1.6359 mins
+****************Yahoo, SOTA model was updated****************
+epoch :  2|20, iter :   36| 101,  loss : 79.4926
+epoch :  2|20, iter :   72| 101,  loss : 78.7454
+train_loss : 78.5803
+test_loss : 6.9055, roc_auc_score : 0.2511
+single epoch costs 1.4960 mins
+****************Yahoo, SOTA model was updated****************
+epoch :  3|20, iter :   36| 101,  loss : 79.9456
+epoch :  3|20, iter :   72| 101,  loss : 80.5700
+train_loss : 80.0360
+test_loss : 6.6235, roc_auc_score : 0.2286
+single epoch costs 1.4788 mins
+****************Yahoo, SOTA model was updated****************
+epoch :  4|20, iter :   36| 101,  loss : 79.8462
+epoch :  4|20, iter :   72| 101,  loss : 79.7642
+train_loss : 79.5659
+test_loss : 6.2629, roc_auc_score : 0.2393
+single epoch costs 1.4626 mins
+****************Yahoo, SOTA model was updated****************
+epoch :  5|20, iter :   36| 101,  loss : 80.5582
+epoch :  5|20, iter :   72| 101,  loss : 80.0369
+train_loss : 79.9279
+test_loss : 6.5611, roc_auc_score : 0.2408
+single epoch costs 1.4446 mins
+****************Yahoo, SOTA model was updated****************
+epoch :  6|20, iter :   36| 101,  loss : 80.0520
+epoch :  6|20, iter :   72| 101,  loss : 79.7606
+train_loss : 80.3562
+test_loss : 7.0328, roc_auc_score : 0.2324
+single epoch costs 1.4750 mins
+epoch :  7|20, iter :   36| 101,  loss : 79.0809
+epoch :  7|20, iter :   72| 101,  loss : 78.5446
+train_loss : 79.3294
+test_loss : 6.1636, roc_auc_score : 0.2413
+single epoch costs 1.4662 mins
+****************Yahoo, SOTA model was updated****************
+epoch :  8|20, iter :   36| 101,  loss : 81.2839
+epoch :  8|20, iter :   72| 101,  loss : 80.8879
+train_loss : 80.7702
+test_loss : 6.3468, roc_auc_score : 0.2339
+single epoch costs 1.5248 mins
+epoch :  9|20, iter :   36| 101,  loss : 81.5326
