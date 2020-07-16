@@ -121,9 +121,11 @@ def infer_args():
 if __name__ == "__main__":
     
     # input = torch.randn(1, 3, 224, 224)
-    input = torch.from_numpy(np.load('input.npy')).cuda()
+    # input = torch.from_numpy(np.load('input.npy')).cuda()
     # print(input.shape)
-#     input = cv2.imread('imgs/live.jpg')
+    lgsc = LGSCInfer(args=infer_args())
+    input = cv2.imread('imgs/live.jpg')
+    lgsc.infer(input)
     # lgsc.infer(input)
 #     lgsc.model['lgsc'].eval()
 #     lgsc.model['lgsc'].module.encoder.eval()
@@ -132,15 +134,13 @@ if __name__ == "__main__":
 #     lgsc.model['lgsc'].module.auxcfer.dropout.eval()
     
     # lgsc.model['lgsc'].train()
-    lgsc = LGSCInfer(args=infer_args())
-    lgsc.model['lgsc'].train()
-    for i in range(5):
+#     for i in range(5):
         
-        print('%s' % (36 * '*'))
+#         print('%s' % (36 * '*'))
         
         # lgsc.model['lgsc'].eval()
-        imgs_feat, clf_out = lgsc.model['lgsc'](input)
-        print(clf_out.cpu().detach().numpy())
+#         imgs_feat, clf_out = lgsc.model['lgsc'](input)
+#         print(clf_out.cpu().detach().numpy())
 #         outs = lgsc.model['lgsc'].module.encoder(input)
 #         print('encoder : %f' % torch.mean(outs[-1]).item())
 #         outs = lgsc.model['lgsc'].module.decoder(outs)

@@ -60,21 +60,25 @@ class LGSCTrainer(object):
         df_train = pd.read_csv(self.args.train_file)
         df_test  = pd.read_csv(self.args.test_file)
         if self.args.is_debug:
-            df_train = df_train.sample(frac=1.0).iloc[:2*self.args.batch_size, :]
-            df_test  = df_test.sample(frac=1.0).iloc[:2*self.args.batch_size, :]
+            k_times = 100
+            df_train = df_train.sample(frac=1.0).iloc[:k_times*self.args.batch_size, :] # TODO
+            df_test  = df_test.sample(frac=1.0).iloc[:k_times*self.args.batch_size, :]  # TODO
             print('### Debug mode was going ###')
             
-        labels = list(df_train.target.values)
-        sampler = BalanceClassSampler(labels, mode="upsampling")
+        # labels = list(df_train.target.values)
+        # sampler = BalanceClassSampler(labels, mode="upsampling")
         self.data['train_loader'] = DataLoader(
                                         dlib.DataBase(df_train, self.args.data_path, train_trans),
                                         batch_size=self.args.batch_size,
-                                        sampler=sampler)
+                                        shuffle=True,
+                                        #sampler=sampler
+                                    )
         self.data['test_loader'] = DataLoader(
                                         dlib.DataBase(df_test, self.args.data_path, test_trans),
                                         batch_size=self.args.batch_size, \
-                                        shuffle=False,
-                                        drop_last=False)
+                                        shuffle=True,
+                                        drop_last=False\
+                                   )
         print('Data loading was finished ...')
 
 
@@ -91,7 +95,9 @@ class LGSCTrainer(object):
         for feat in outs[:-1]:
             feat = F.adaptive_avg_pool2d(feat, [1, 1]).view(batchsize, -1)
             trip_loss += self.model['triplet'](feat, target) * self.args.loss_coef['trip_loss']
+            
         total_loss = clf_loss + reg_loss + trip_loss
+        print('clf_loss : %.4f, reg_loss : %.4f, trip_loss : %.4f' % (clf_loss, reg_loss, trip_loss))
         return total_loss
     
     
@@ -133,15 +139,15 @@ class LGSCTrainer(object):
                     gtys = gtys.cuda()
                 imgs_feats, clf_out = self.model['lgsc'](imgs)
                 loss  = self.calc_losses(imgs_feats, clf_out, gtys)
-                score = self.softmax(clf_out).cpu().numpy()[:, 1].tolist()
+                score = self.softmax(clf_out).cpu().numpy()
+                predy = np.argmax(score, axis=1).tolist()
                 iter_loss_list.append(loss.item())
                 iter_gtys_list.extend(gtys.cpu().numpy().tolist())
-                iter_pred_list.extend(score)
+                iter_pred_list.extend(predy)
         eval_info = {}
         eval_info['loss'] = np.mean(iter_loss_list)
-        eval_info['rauc'] = metrics.roc_auc_score(np.array(iter_gtys_list), np.array(iter_pred_list))
-        # eval_info['eval_auc']  = self.calculate_acc(iter_gtys_list, iter_pred_list)
-        print('test_loss : %.4f, roc_auc_score : %.4f' % (eval_info['loss'], eval_info['rauc']))
+        eval_info['racc'] = self.calculate_acc(iter_gtys_list, iter_pred_list)
+        print('test_loss : %.4f, racc_score : %.4f' % (eval_info['loss'], eval_info['racc']))
         return eval_info
             
             
@@ -155,11 +161,11 @@ class LGSCTrainer(object):
         precision  = metrics.precision_score(gt_y, pred_y)
         print('auc : %.4f, acc : %.4f, precision : %.4f, recall : %.4f, f1_score : %.4f' % \
                   (auc, acc, precision, recall, f1_score))
-
         print('%s gt vs. pred %s' % ('-' * 36, '-' * 36))
         print(metrics.classification_report(gt_y, pred_y, digits=4))
         print(metrics.confusion_matrix(gt_y, pred_y))
         print('-' * 85)
+        return acc
         
         
     def save_weights(self, testinfo = {}):
@@ -169,25 +175,25 @@ class LGSCTrainer(object):
             os.mkdir(self.args.save_to)
             
         freq_flag = self.result['epoch'] % self.args.save_freq == 0
-        sota_flag = self.result['min_loss'] > testinfo['loss'] or self.result['max_auc'] < testinfo['rauc']
-        save_name = '%s/epoch_%02d-loss_%.4f-rauc_%.4f.pth' % \
-                         (self.args.save_to, self.result['epoch'], testinfo['loss'], testinfo['rauc'])
+        sota_flag = self.result['min_loss'] > testinfo['loss'] or self.result['max_acc'] < testinfo['racc']
+        save_name = '%s/epoch_%02d-loss_%.4f-racc_%.4f.pth' % \
+                         (self.args.save_to, self.result['epoch'], testinfo['loss'], testinfo['racc'])
         if sota_flag:
             save_name = '%s/sota.pth' % self.args.save_to
             self.result['min_loss'] = testinfo['loss']
-            self.result['max_auc']  = testinfo['rauc']
-            print('%sYahoo, SOTA model was updated%s' % ('*'*16, '*'*16))
+            self.result['max_acc']  = testinfo['racc']
+            print('%s Yahoo, SOTA model was updated %s' % ('*'*16, '*'*16))
         
         if sota_flag or freq_flag:
             torch.save({
                 'epoch'   : self.result['epoch'], 
                 'backbone': self.model['lgsc'].state_dict(),
                 'loss'    : testinfo['loss'],
-                'roc-auc' : testinfo['rauc']}, save_name)
+                'racc'    : testinfo['racc']}, save_name)
             
         if sota_flag and freq_flag:
-            normal_name = '%s/epoch_%02d-loss_%.4f-rauc_%.4f.pth' % \
-                               (self.args.save_to, self.result['epoch'], testinfo['loss'], testinfo['rauc'])
+            normal_name = '%s/epoch_%02d-loss_%.4f-racc_%.4f.pth' % \
+                               (self.args.save_to, self.result['epoch'], testinfo['loss'], testinfo['racc'])
             shutil.copy(save_name, normal_name)
             
 
@@ -199,12 +205,13 @@ class LGSCTrainer(object):
             
             start_time = time.time()
             self.result['epoch'] = epoch
-            train_loss = self.train_one_epoch()
+            # train_loss = self.train_one_epoch()
+            # self.model['scheduler'].step()
             test_info  = self.test_one_epoch()
             finish_time = time.time()
             print('single epoch costs %.4f mins' % ((finish_time - start_time) / 60))
-            self.save_weights(test_info)
-            
+            # self.save_weights(test_info)
+            break
             if self.args.is_debug:
                 break
     

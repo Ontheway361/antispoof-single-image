@@ -16,8 +16,8 @@ def get_train_augmentations():
             alt.Resize(224, 224, p=1),
             alt.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=20, val_shift_limit=10, p=0.2),
             alt.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.3),
-            alt.CoarseDropout(10),
-            alt.Rotate(30),
+            # alt.CoarseDropout(10),
+            # alt.Rotate(30),
             alt.Normalize(),
             ToTensor(),
         ]
@@ -43,7 +43,7 @@ def get_train_augmentations():
 
 
 def get_test_augmentations():
-    return alt.Compose([alt.LongestMaxSize(224), alt.PadIfNeeded(224, 224, 0), alt.Normalize(), ToTensor()])
+    return alt.Compose([alt.Resize(224, 224, p=1), alt.Normalize(), ToTensor()])
 
 
 class DataBase(torch.utils.data.Dataset):
@@ -62,7 +62,6 @@ class DataBase(torch.utils.data.Dataset):
         path = os.path.join(self.root, self.df.iloc[index].now_path)
         file = np.random.choice(os.listdir(path))
         full_path = os.path.join(path, file)
-        # image = np.array(Image.open(full_path))
         image = cv2.imread(full_path)
         image = self.transforms(image=image)['image']
         target = self.df.iloc[index].target

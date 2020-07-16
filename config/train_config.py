@@ -23,23 +23,23 @@ def training_args():
 
     # -- optimizer
     parser.add_argument('--start_epoch', type=int,   default=1)         #
-    parser.add_argument('--n_epoches',   type=int,   default=20)        # paper-setting
-    parser.add_argument('--batch_size',  type=int,   default=32)         # paper-setting
+    parser.add_argument('--n_epoches',   type=int,   default=25)        # paper-setting
+    parser.add_argument('--batch_size',  type=int,   default=64)        # paper-setting
     parser.add_argument('--base_lr',     type=float, default=5e-4)      # paper-setting : 1e-3 | org-repo : 5e-4
     parser.add_argument('--milestones',  type=list,  default=[5, 8, 12])# org-repo
     parser.add_argument('--gamma',       type=float, default=0.3)       # org-repo TODO
-    parser.add_argument('--resume',      type=str,   default='')        # checkpoint
+    parser.add_argument('--resume',      type=str,   default=osp.join(cp_dir, 'siw_baseline/sota.pth'))        # checkpoint
 
     # -- dataset
     parser.add_argument('--data_path',  type=str, default=root_dir)
-    parser.add_argument('--train_file', type=str, default=osp.join(root_dir, 'anno_file/train_normal_sample.csv'))  # 2316
-    parser.add_argument('--test_file',  type=str, default=osp.join(root_dir, 'anno_file/test_normal_sample.csv'))   # 1967
+    parser.add_argument('--train_file', type=str, default=osp.join(root_dir, 'anno_file/train_normal_sample.csv'))  # 115800 | blance-125198
+    parser.add_argument('--test_file',  type=str, default=osp.join(root_dir, 'anno_file/test_normal_sample.csv'))   # 98350
 
     # -- save or print
     parser.add_argument('--is_debug',  type=str, default=False)
     parser.add_argument('--save_to',   type=str, default=osp.join(cp_dir, 'siw_baseline'))
-    parser.add_argument('--print_freq',type=int, default=36)   # (2316, 32, 73)
-    parser.add_argument('--save_freq', type=int, default=2)    
+    parser.add_argument('--print_freq',type=int, default=32)   # (125198, 96, 1305, 400)
+    parser.add_argument('--save_freq', type=int, default=20)    
 
     args = parser.parse_args()
 

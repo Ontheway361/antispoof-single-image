@@ -15,7 +15,7 @@ from IPython import embed
 
 class LGSC(nn.Module):
 
-    def __init__(self, drop_ratio = 0.5, training = False, pretrained = True):
+    def __init__(self, drop_ratio = 0.5, pretrained = True):
         super(LGSC, self).__init__()
         self.encoder = EnCoder(pretrained=pretrained)
         self.decoder = DeCoder()
@@ -24,8 +24,8 @@ class LGSC(nn.Module):
     def forward(self, x):
         outs = self.encoder(x)
         outs = self.decoder(outs)
-        s    = x + outs[-1]
-        clfo = self.auxcfer(s)
+        overlayed = x + outs[-1]
+        clfo = self.auxcfer(overlayed)
         return outs, clfo
     
     
