@@ -261,3 +261,22 @@ single epoch costs 1.2885 mins
 epoch : 14|25, iter :   36|  73,  loss : 0.5902
 epoch : 14|25, iter :   72|  73,  loss : 0.5717
 train_loss : 0.6165
+auc : 0.9939, acc : 0.9914, precision : 0.9712, recall : 1.0000, f1_score : 0.9854
+------------------------------------ gt vs. pred ------------------------------------
+              precision    recall  f1-score   support
+
+           0     1.0000    0.9878    0.9939      1393
+           1     0.9712    1.0000    0.9854       574
+
+    accuracy                         0.9914      1967
+   macro avg     0.9856    0.9939    0.9896      1967
+weighted avg     0.9916    0.9914    0.9914      1967
+
+[[1376   17]
+ [   0  574]]
+-------------------------------------------------------------------------------------
+test_loss : 0.8237, racc_score : 0.9914
+single epoch costs 1.2757 mins
+epoch : 15|25, iter :   36|  73,  loss : 0.6306
+epoch : 15|25, iter :   72|  73,  loss : 0.9111
+train_loss : 0.9049
