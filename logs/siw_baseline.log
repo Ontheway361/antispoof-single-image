@@ -241,3 +241,23 @@ single epoch costs 1.2739 mins
 epoch : 13|25, iter :   36|  73,  loss : 1.0965
 epoch : 13|25, iter :   72|  73,  loss : 1.1162
 train_loss : 1.1069
+auc : 0.9989, acc : 0.9985, precision : 0.9948, recall : 1.0000, f1_score : 0.9974
+------------------------------------ gt vs. pred ------------------------------------
+              precision    recall  f1-score   support
+
+           0     1.0000    0.9978    0.9989      1393
+           1     0.9948    1.0000    0.9974       574
+
+    accuracy                         0.9985      1967
+   macro avg     0.9974    0.9989    0.9982      1967
+weighted avg     0.9985    0.9985    0.9985      1967
+
+[[1390    3]
+ [   0  574]]
+-------------------------------------------------------------------------------------
+test_loss : 0.3012, racc_score : 0.9985
+single epoch costs 1.2885 mins
+**************** Yahoo, SOTA model was updated ****************
+epoch : 14|25, iter :   36|  73,  loss : 0.5902
+epoch : 14|25, iter :   72|  73,  loss : 0.5717
+train_loss : 0.6165

@@ -8,9 +8,9 @@ Package LGSC into a universal basic module for following research and projects
 The following pictures are randomly chosen from siw_release/test, their cue_spoof_score are ,  and .
 <table style="border:0px">
    <tr>
-       <td><img src="imgs/cue_live.jpg" width="448" height="224" frame=void rules=none></td>
-       <td><img src="imgs/cue_printsp.jpg" width="440" height="224" frame=void rules=none></td>
-       <td><img src="imgs/cue_videoplay.jpg" width="440" height="224" frame=void rules=none></td>
+       <td><img src="imgs/cue_live.jpg" width="448" height="112" frame=void rules=none></td>
+       <td><img src="imgs/cue_printsp.jpg" width="440" height="112" frame=void rules=none></td>
+       <td><img src="imgs/cue_videoplay.jpg" width="440" height="112" frame=void rules=none></td>
 </table>
 
 ## Citation
