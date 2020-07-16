@@ -33,7 +33,7 @@ class LGSCTrainer(object):
     def _model_loader(self):
 
         self.model['lgsc']      = corelib.LGSC(drop_ratio=self.args.drop_ratio)
-        self.model['triplet']   = corelib.TripletLoss(margin=self.args.margin)
+        self.model['triplet']   = corelib.TripletLoss(margin=self.args.margin, squared=False)
         self.model['optimizer'] = torch.optim.Adam(
                                       self.model['lgsc'].parameters(), lr=self.args.base_lr)
         self.model['scheduler'] = torch.optim.lr_scheduler.MultiStepLR(
@@ -60,7 +60,7 @@ class LGSCTrainer(object):
         df_train = pd.read_csv(self.args.train_file)
         df_test  = pd.read_csv(self.args.test_file)
         if self.args.is_debug:
-            k_times = 100
+            k_times = 2
             df_train = df_train.sample(frac=1.0).iloc[:k_times*self.args.batch_size, :] # TODO
             df_test  = df_test.sample(frac=1.0).iloc[:k_times*self.args.batch_size, :]  # TODO
             print('### Debug mode was going ###')
@@ -95,9 +95,7 @@ class LGSCTrainer(object):
         for feat in outs[:-1]:
             feat = F.adaptive_avg_pool2d(feat, [1, 1]).view(batchsize, -1)
             trip_loss += self.model['triplet'](feat, target) * self.args.loss_coef['trip_loss']
-            
         total_loss = clf_loss + reg_loss + trip_loss
-        print('clf_loss : %.4f, reg_loss : %.4f, trip_loss : %.4f' % (clf_loss, reg_loss, trip_loss))
         return total_loss
     
     
@@ -116,6 +114,9 @@ class LGSCTrainer(object):
             
             imgs_feats, clf_out = self.model['lgsc'](imgs)
             loss = self.calc_losses(imgs_feats, clf_out, gtys)
+            self.model['optimizer'].zero_grad()
+            loss.backward()
+            self.model['optimizer'].step()
             iter_loss_list.append(loss.item())
             if (idx + 1) % self.args.print_freq == 0:
                 print('epoch : %2d|%2d, iter : %4d|%4d,  loss : %.4f' % (self.result['epoch'], 
@@ -205,13 +206,12 @@ class LGSCTrainer(object):
             
             start_time = time.time()
             self.result['epoch'] = epoch
-            # train_loss = self.train_one_epoch()
-            # self.model['scheduler'].step()
+            train_loss = self.train_one_epoch()
             test_info  = self.test_one_epoch()
+            self.model['scheduler'].step()
             finish_time = time.time()
             print('single epoch costs %.4f mins' % ((finish_time - start_time) / 60))
-            # self.save_weights(test_info)
-            break
+            self.save_weights(test_info)
             if self.args.is_debug:
                 break
     

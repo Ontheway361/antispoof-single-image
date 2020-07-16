@@ -1,1 +1,1 @@
-from core.loss.triplet import TripletLoss
+from core.loss.tripletloss import TripletLoss

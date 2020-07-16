@@ -1,14 +1,17 @@
 ## Motivation
 Package LGSC into a universal basic module for following research and projects
 
-## Reference
-```
-[1].https://github.com/VIS-VAR/LGSC-for-FAS
-[2].https://github.com/Podidiving/lgsc-for-fas-pytorch
-```
-
 ## Pipeline
 ![Image text](https://github.com/Ontheway361/antispoof-single-image/blob/master/imgs/pipeline.png)
+
+## Result
+The following pictures are randomly chosen from siw_release/test, their cue_spoof_score are ,  and .
+<table style="border:0px">
+   <tr>
+       <td><img src="imgs/cue_live.jpg" width="448" height="224" frame=void rules=none></td>
+       <td><img src="imgs/cue_printsp.jpg" width="440" height="224" frame=void rules=none></td>
+       <td><img src="imgs/cue_videoplay.jpg" width="440" height="224" frame=void rules=none></td>
+</table>
 
 ## Citation
 ```
@@ -22,4 +25,10 @@ Package LGSC into a universal basic module for following research and projects
     archivePrefix={arXiv},
     primaryClass={cs.CV}
 }
+```
+
+## Reference
+```
+[1].https://github.com/VIS-VAR/LGSC-for-FAS
+[2].https://github.com/Podidiving/lgsc-for-fas-pytorch
 ```
