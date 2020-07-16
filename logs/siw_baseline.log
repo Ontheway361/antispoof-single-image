@@ -297,3 +297,43 @@ weighted avg     0.9926    0.9924    0.9924      1967
 test_loss : 0.6493, racc_score : 0.9924
 single epoch costs 1.2882 mins
 epoch : 16|25, iter :   36|  73,  loss : 0.7048
+epoch : 16|25, iter :   72|  73,  loss : 0.7227
+train_loss : 0.7213
+auc : 0.9963, acc : 0.9954, precision : 0.9862, recall : 0.9983, f1_score : 0.9922
+------------------------------------ gt vs. pred ------------------------------------
+              precision    recall  f1-score   support
+
+           0     0.9993    0.9943    0.9968      1393
+           1     0.9862    0.9983    0.9922       574
+
+    accuracy                         0.9954      1967
+   macro avg     0.9928    0.9963    0.9945      1967
+weighted avg     0.9955    0.9954    0.9954      1967
+
+[[1385    8]
+ [   1  573]]
+-------------------------------------------------------------------------------------
+test_loss : 0.4621, racc_score : 0.9954
+single epoch costs 1.2960 mins
+epoch : 17|25, iter :   36|  73,  loss : 0.7771
+epoch : 17|25, iter :   72|  73,  loss : 0.6172
+train_loss : 0.6874
+auc : 0.9966, acc : 0.9959, precision : 0.9879, recall : 0.9983, f1_score : 0.9931
+------------------------------------ gt vs. pred ------------------------------------
+              precision    recall  f1-score   support
+
+           0     0.9993    0.9950    0.9971      1393
+           1     0.9879    0.9983    0.9931       574
+
+    accuracy                         0.9959      1967
+   macro avg     0.9936    0.9966    0.9951      1967
+weighted avg     0.9960    0.9959    0.9959      1967
+
+[[1386    7]
+ [   1  573]]
+-------------------------------------------------------------------------------------
+test_loss : 0.3499, racc_score : 0.9959
+single epoch costs 1.2864 mins
+epoch : 18|25, iter :   36|  73,  loss : 0.4847
+epoch : 18|25, iter :   72|  73,  loss : 0.6148
+train_loss : 0.6132

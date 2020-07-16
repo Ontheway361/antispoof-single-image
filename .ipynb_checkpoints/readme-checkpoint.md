@@ -5,7 +5,7 @@ Package LGSC into a universal basic module for following research and projects
 ![Image text](https://github.com/Ontheway361/antispoof-single-image/blob/master/imgs/pipeline.png)
 
 ## Result
-The following pictures are randomly chosen from siw_release/test, their cue_spoof_score are ,  and .
+The following pictures are randomly chosen from siw_release/test {live, print, videoplay}, their cue_spoof_score are 0.0093, 0.0925 and 0.1530.
 <table style="border:0px">
    <tr>
        <td><img src="imgs/cue_live.jpg" width="448" height="130" frame=void rules=none></td>
