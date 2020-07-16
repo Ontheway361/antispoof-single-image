@@ -2,6 +2,7 @@
 #-*- coding:utf-8 -*-
 
 import torch.nn as nn
+import torch.nn.functional as F
 from IPython import embed
 
 # https://github.com/Yuol96/pytorch-triplet-loss
@@ -12,8 +13,6 @@ def pairwise_distances(embeddings, squared=False):
     """
     # get dot product (batch_size, batch_size)
     dot_product = embeddings.mm(embeddings.t())
-
-    # a vector
     square_sum = dot_product.diag()
     distances = square_sum.unsqueeze(1) - 2 * dot_product + square_sum.unsqueeze(0)
     distances = distances.clamp(min=0)
@@ -138,5 +137,7 @@ class TripletLoss(nn.Module):
         self.margin = margin
 
     def forward(self, pred, target):
+
+        pred = F.normalize(pred)  # l2_normlize
         loss, _ = batch_all_triplet_loss(target, pred, self.margin, squared=True)
         return loss
