@@ -30,5 +30,4 @@ The following pictures are randomly chosen from siw_release/test {live, print, v
 ## Reference
 ```
 [1].https://github.com/VIS-VAR/LGSC-for-FAS
-[2].https://github.com/Podidiving/lgsc-for-fas-pytorch
 ```
